@@ -5,7 +5,7 @@ TweenSequence chainTweens(List<double> values) {
     return TweenSequence<double>([]);
   }
 
-  List<TweenSequenceItem<double>> items = List<TweenSequenceItem<double>>();
+  List<TweenSequenceItem<double>> items = <TweenSequenceItem<double>>[];
 
   var lastValue = values[0];
   for (int i = 1; i < values.length; ++i) {
