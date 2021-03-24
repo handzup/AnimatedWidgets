@@ -9,7 +9,7 @@ class TranslationAnimatedWidget extends StatefulWidget {
   final bool enabled;
   final Curve curve;
   final Widget child;
-  final Function(bool) animationFinished;
+  final Function(bool)? animationFinished;
 
   /// An translation animation using 2 values : enabled - disabled
   ///
@@ -28,9 +28,9 @@ class TranslationAnimatedWidget extends StatefulWidget {
     Offset translationDisabled = const Offset(0, 200),
     Offset translationEnabled = const Offset(0, 0),
     bool enabled = true,
-    Function(bool) animationFinished,
+    Function(bool)? animationFinished,
     Curve curve = Curves.linear,
-    @required Widget child,
+    required Widget child,
   }) : this(
           duration: duration,
           enabled: enabled,
@@ -61,8 +61,8 @@ class TranslationAnimatedWidget extends StatefulWidget {
     this.enabled = true,
     this.curve = Curves.linear,
     this.animationFinished,
-    @required this.child,
-  })  : this._values = values,
+    required this.child,
+  })   : this._values = values,
         assert(values.length > 1);
 
   List<Offset> get values => _values;
@@ -80,9 +80,9 @@ class TranslationAnimatedWidget extends StatefulWidget {
 
 class _State extends State<TranslationAnimatedWidget>
     with TickerProviderStateMixin {
-  AnimationController _animationController;
-  Animation<double> _translationXAnim;
-  Animation<double> _translationYAnim;
+  AnimationController? _animationController;
+  late Animation<double> _translationXAnim;
+  late Animation<double> _translationYAnim;
 
   @override
   void didUpdateWidget(TranslationAnimatedWidget oldWidget) {
@@ -100,11 +100,11 @@ class _State extends State<TranslationAnimatedWidget>
   }
 
   void _updateAnimationState() async {
-    if (widget.enabled ?? false) {
+    if (widget.enabled) {
       await Future.delayed(widget.delay);
-      _animationController.forward();
+      _animationController!.forward();
     } else {
-      _animationController.reverse();
+      _animationController!.reverse();
     }
   }
 
@@ -115,23 +115,25 @@ class _State extends State<TranslationAnimatedWidget>
       vsync: this,
     )..addStatusListener((status) {
         if (widget.animationFinished != null) {
-          widget.animationFinished(widget.enabled);
+          widget.animationFinished!(widget.enabled);
         }
       });
 
     _translationXAnim = chainTweens(
       widget.values.map((it) => it.dx).toList(),
     ).animate(
-      CurvedAnimation(parent: _animationController, curve: widget.curve),
-    )..addListener(() {
+      CurvedAnimation(parent: _animationController!, curve: widget.curve),
+    ) as Animation<double>
+      ..addListener(() {
         setState(() {});
       });
 
     _translationYAnim = chainTweens(
       widget.values.map((it) => it.dy).toList(),
     ).animate(
-      CurvedAnimation(parent: _animationController, curve: widget.curve),
-    )..addListener(() {
+      CurvedAnimation(parent: _animationController!, curve: widget.curve),
+    ) as Animation<double>
+      ..addListener(() {
         setState(() {});
       });
 
@@ -154,7 +156,7 @@ class _State extends State<TranslationAnimatedWidget>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController!.dispose();
     super.dispose();
   }
 }

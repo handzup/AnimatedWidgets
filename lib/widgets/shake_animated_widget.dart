@@ -1,6 +1,5 @@
 import 'package:animated_widgets/core/chain_tweens.dart';
 import 'package:animated_widgets/widgets/rotation_animated.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ShakeAnimatedWidget extends StatefulWidget {
@@ -28,7 +27,7 @@ class ShakeAnimatedWidget extends StatefulWidget {
     this.curve = Curves.linear,
     this.enabled = true,
     this.alignment = Alignment.center,
-    @required this.child,
+    required this.child,
   });
 
   @override
@@ -42,10 +41,10 @@ class ShakeAnimatedWidget extends StatefulWidget {
 }
 
 class _State extends State<ShakeAnimatedWidget> with TickerProviderStateMixin {
-  AnimationController _animationController;
-  Animation<double> _rotationXAnim;
-  Animation<double> _rotationYAnim;
-  Animation<double> _rotationZAnim;
+  AnimationController? _animationController;
+  late Animation<double> _rotationXAnim;
+  late Animation<double> _rotationYAnim;
+  late Animation<double> _rotationZAnim;
 
   @override
   void didUpdateWidget(ShakeAnimatedWidget oldWidget) {
@@ -61,10 +60,10 @@ class _State extends State<ShakeAnimatedWidget> with TickerProviderStateMixin {
   }
 
   void _updateAnimationState() async {
-    if (widget.enabled ?? false) {
-      _animationController.repeat();
+    if (widget.enabled) {
+      _animationController!.repeat();
     } else {
-      _animationController.reset();
+      _animationController!.reset();
     }
   }
 
@@ -76,33 +75,36 @@ class _State extends State<ShakeAnimatedWidget> with TickerProviderStateMixin {
           ..addStatusListener((status) {
             //restart
             if (status == AnimationStatus.completed) {
-              _animationController.forward();
+              _animationController!.forward();
             }
           });
 
     _rotationXAnim =
         chainTweens([0.0, widget.shakeAngle.x, 0.0, -widget.shakeAngle.x, 0.0])
             .animate(
-      CurvedAnimation(parent: _animationController, curve: widget.curve),
-    )..addListener(() {
-                setState(() {});
-              });
+      CurvedAnimation(parent: _animationController!, curve: widget.curve),
+    ) as Animation<double>
+          ..addListener(() {
+            setState(() {});
+          });
 
     _rotationYAnim =
         chainTweens([0.0, widget.shakeAngle.y, 0.0, -widget.shakeAngle.y, 0.0])
             .animate(
-      CurvedAnimation(parent: _animationController, curve: widget.curve),
-    )..addListener(() {
-                setState(() {});
-              });
+      CurvedAnimation(parent: _animationController!, curve: widget.curve),
+    ) as Animation<double>
+          ..addListener(() {
+            setState(() {});
+          });
 
     _rotationZAnim =
         chainTweens([0.0, widget.shakeAngle.z, 0.0, -widget.shakeAngle.z, 0.0])
             .animate(
-      CurvedAnimation(parent: _animationController, curve: widget.curve),
-    )..addListener(() {
-                setState(() {});
-              });
+      CurvedAnimation(parent: _animationController!, curve: widget.curve),
+    ) as Animation<double>
+          ..addListener(() {
+            setState(() {});
+          });
   }
 
   @override
@@ -126,7 +128,7 @@ class _State extends State<ShakeAnimatedWidget> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController!.dispose();
     super.dispose();
   }
 }
